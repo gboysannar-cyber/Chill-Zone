@@ -1,31 +1,486 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Chill Zone</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft — Web Edition</title>
     <style>
-        body {
-            background: #111;
-            color: white;
-            font-family: Arial;
-            text-align: center;
-            padding-top: 100px;
+        :root {
+            --bg: #0c0c18;
+            --surface: #141428;
+            --accent: #5b8c3e;
+            --accent-glow: #7ec850;
+            --text: #e0ddd4;
+            --muted: #8a887e;
+            --radius: 10px;
+            --bar-height: 48px;
+            --transition: 220ms ease;
         }
 
-        button {
-            padding: 15px 30px;
-            margin: 10px;
-            font-size: 18px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+            height: 100dvh;
+            width: 100vw;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ── Game Container ─────────────────────── */
+        .game-wrapper {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            background: #000;
+        }
+
+        /* ── Loading Screen ────────────────────── */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: opacity 0.45s ease, visibility 0.45s ease;
+            gap: 20px;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-block {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 4px;
+            animation: loaderBounce 0.7s ease-in-out infinite alternate;
+            box-shadow: 0 0 28px rgba(126, 200, 80, 0.45);
+        }
+
+        @keyframes loaderBounce {
+            0% {
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-16px) rotate(8deg);
+            }
+        }
+
+        .loading-text {
+            color: var(--muted);
+            font-size: 0.9rem;
+            letter-spacing: 0.06em;
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* ── Auto-hide Overlay Bar ────────────── */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--bar-height);
+            background: rgba(20, 20, 40, 0.78);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 18px;
+            z-index: 50;
+            transition: transform var(--transition), opacity var(--transition);
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .top-bar.hidden {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        .bar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            border-radius: 4px;
+            box-shadow: 0 0 12px rgba(126, 200, 80, 0.35);
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 2px;
+        }
+
+        .bar-title {
+            color: var(--text);
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+        }
+
+        .bar-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ── Buttons ──────────────────────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 7px;
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text);
+            font-size: 0.82rem;
+            font-family: inherit;
             cursor: pointer;
+            transition: background var(--transition), border-color var(--transition),
+                box-shadow var(--transition);
+            white-space: nowrap;
+            letter-spacing: 0.02em;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .btn:active {
+            background: rgba(255, 255, 255, 0.16);
+            transform: scale(0.97);
+        }
+
+        .btn-fullscreen {
+            border-color: rgba(126, 200, 80, 0.35);
+            background: rgba(91, 140, 62, 0.15);
+        }
+
+        .btn-fullscreen:hover {
+            border-color: rgba(126, 200, 80, 0.6);
+            background: rgba(91, 140, 62, 0.28);
+            box-shadow: 0 0 16px rgba(126, 200, 80, 0.18);
+        }
+
+        .btn svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            pointer-events: none;
+        }
+
+        /* ── Fullscreen Overlay Hint ──────────── */
+        .fullscreen-hint {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20, 20, 40, 0.82);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 8px 18px;
+            color: var(--muted);
+            font-size: 0.78rem;
+            letter-spacing: 0.04em;
+            z-index: 40;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            opacity: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .fullscreen-hint.fading {
+            opacity: 0;
+        }
+
+        .kbd {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 4px;
+            padding: 2px 7px;
+            font-size: 0.72rem;
+            font-family: inherit;
+            letter-spacing: 0;
+            color: var(--text);
+            min-width: 22px;
+            text-align: center;
+        }
+
+        /* ── Fullscreen State ─────────────────── */
+        .game-wrapper:fullscreen .top-bar {
+            background: rgba(20, 20, 40, 0.65);
+        }
+
+        .game-wrapper:fullscreen .fullscreen-hint {
+            opacity: 0;
+        }
+
+        /* Safari */
+        .game-wrapper:-webkit-full-screen .top-bar {
+            background: rgba(20, 20, 40, 0.65);
+        }
+
+        /* ── Responsive ───────────────────────── */
+        @media (max-width: 600px) {
+            .top-bar {
+                padding: 0 10px;
+                height: 42px;
+            }
+            .bar-title {
+                font-size: 0.82rem;
+            }
+            .btn {
+                padding: 5px 10px;
+                font-size: 0.75rem;
+                gap: 4px;
+            }
+            .btn svg {
+                width: 14px;
+                height: 14px;
+            }
+            .logo-icon {
+                width: 22px;
+                height: 22px;
+            }
+            .fullscreen-hint {
+                bottom: 14px;
+                font-size: 0.7rem;
+                padding: 6px 14px;
+            }
         }
     </style>
 </head>
-
 <body>
-    <h1>🎮 Chill Zone</h1>
-    <p>Work done? Time to chill.</p>
 
-    <button onclick="alert('Snake coming soon 👀')">🐍 Snake</button>
-    <button onclick="alert('2048 coming soon 👀')">🔢 2048</button>
-    <button onclick="alert('Pong coming soon 👀')">🏓 Pong</button>
+    <!-- ═══════════════ Loading Screen ═══════════════ -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loader-block"></div>
+        <span class="loading-text">Loading Minecraft…</span>
+    </div>
+
+    <!-- ═══════════════ Game ═══════════════ -->
+    <!--
+        👇 Change this src to YOUR Minecraft HTML file.
+        Examples:
+          src="./minecraft.html"
+          src="./game/index.html"
+          src="[classic.minecraft.net](https://classic.minecraft.net)"
+    -->
+    <div class="game-wrapper" id="gameWrapper">
+        <iframe
+        id="gameFrame"
+        src="./minecraft.html"
+        allow="cross-origin-isolated; autoplay; fullscreen; gamepad; microphone"
+        allowfullscreen
+        loading="eager"
+        title="Minecraft"></iframe>
+    </div>
+
+    <!-- ═══════════════ Top Bar ═══════════════ -->
+    <div class="top-bar" id="topBar">
+        <div class="bar-left">
+            <div class="logo-icon"></div>
+            <span class="bar-title">Minecraft</span>
+        </div>
+        <div class="bar-right">
+            <button class="btn btn-fullscreen" id="fullscreenBtn" title="Toggle fullscreen (F)">
+                <!-- expand icon -->
+                <svg id="iconExpand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+                    <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+                    <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+                    <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+                </svg>
+                <!-- collapse icon (swapped in fullscreen) -->
+                <svg id="iconCollapse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                    <path d="M8 3v3a2 2 0 0 1-2 2H3"/>
+                    <path d="M21 8h-3a2 2 0 0 1-2-2V3"/>
+                    <path d="M3 16h3a2 2 0 0 1 2 2v3"/>
+                    <path d="M16 21v-3a2 2 0 0 1 2-2h3"/>
+                </svg>
+                <span id="fsLabel">Fullscreen</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══════════════ Keyboard Hint ═══════════════ -->
+    <div class="fullscreen-hint" id="fsHint">
+        Press <span class="kbd">F</span> for fullscreen
+    </div>
+
+    <script>
+        (function() {
+            const gameWrapper = document.getElementById('gameWrapper');
+            const gameFrame = document.getElementById('gameFrame');
+            const topBar = document.getElementById('topBar');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            const fsLabel = document.getElementById('fsLabel');
+            const fsHint = document.getElementById('fsHint');
+            const iconExpand = document.getElementById('iconExpand');
+            const iconCollapse = document.getElementById('iconCollapse');
+
+            let hideBarTimer = null;
+            let hideHintTimer = null;
+
+            // ── Loading ─────────────────────────
+            gameFrame.addEventListener('load', () => {
+                loadingOverlay.classList.add('hidden');
+            });
+
+            // Fallback: hide loader after 8s even if iframe doesn't fire load
+            setTimeout(() => {
+                loadingOverlay.classList.add('hidden');
+            }, 8000);
+
+            // ── Fullscreen Toggle ───────────────
+            function isFullscreen() {
+                return !!(
+                    document.fullscreenElement ||
+                    document.webkitFullscreenElement
+                );
+            }
+
+            function updateFullscreenUI() {
+                const fs = isFullscreen();
+                if (fs) {
+                    iconExpand.style.display = 'none';
+                    iconCollapse.style.display = '';
+                    fsLabel.textContent = 'Exit';
+                    fsHint.classList.add('fading');
+                } else {
+                    iconExpand.style.display = '';
+                    iconCollapse.style.display = 'none';
+                    fsLabel.textContent = 'Fullscreen';
+                    fsHint.classList.remove('fading');
+                }
+            }
+
+            async function toggleFullscreen() {
+                if (isFullscreen()) {
+                    if (document.exitFullscreen) {
+                        await document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        await document.webkitExitFullscreen();
+                    }
+                } else {
+                    if (gameWrapper.requestFullscreen) {
+                        await gameWrapper.requestFullscreen();
+                    } else if (gameWrapper.webkitRequestFullscreen) {
+                        await gameWrapper.webkitRequestFullscreen();
+                    }
+                }
+                updateFullscreenUI();
+                showBar();
+            }
+
+            fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+            // Listen for native fullscreen changes (Esc key, F11, etc.)
+            document.addEventListener('fullscreenchange', updateFullscreenUI);
+            document.addEventListener('webkitfullscreenchange', updateFullscreenUI);
+
+            // ── Auto-hide Top Bar ───────────────
+            function showBar() {
+                topBar.classList.remove('hidden');
+                clearTimeout(hideBarTimer);
+                hideBarTimer = setTimeout(() => {
+                    topBar.classList.add('hidden');
+                }, 2800);
+            }
+
+            function onMouseMove(e) {
+                // Only show bar when mouse is near top 60px or already visible
+                if (e.clientY < 60 || !topBar.classList.contains('hidden')) {
+                    showBar();
+                }
+                // Also handle hint fade
+                clearTimeout(hideHintTimer);
+                fsHint.classList.remove('fading');
+                hideHintTimer = setTimeout(() => {
+                    fsHint.classList.add('fading');
+                }, 6000);
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('touchstart', () => {
+                showBar();
+                fsHint.classList.remove('fading');
+                clearTimeout(hideHintTimer);
+                hideHintTimer = setTimeout(() => fsHint.classList.add('fading'), 6000);
+            }, { passive: true });
+
+            // ── Keyboard Shortcuts ──────────────
+            document.addEventListener('keydown', (e) => {
+                // F key for fullscreen (don't trigger inside inputs or when typing in game)
+                if (e.key === 'f' && !e.ctrlKey && !e.metaKey && !e.altKey &&
+                    document.activeElement === document.body) {
+                    e.preventDefault();
+                    toggleFullscreen();
+                }
+            });
+
+            // ── Init ────────────────────────────
+            updateFullscreenUI();
+            showBar();
+            // Hide hint after 10 sec
+            hideHintTimer = setTimeout(() => fsHint.classList.add('fading'), 10000);
+        })();
+    </script>
 </body>
 </html>
