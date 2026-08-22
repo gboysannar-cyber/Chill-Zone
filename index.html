@@ -1,843 +1,1006 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0b0c0d">
-
-  <title>The Underground</title>
-  <meta
-    name="description"
-    content="The Underground — a minimal collection of games."
-  >
-
-  <style>
-    :root {
-      --bg: #0b0c0d;
-      --panel: #111315;
-      --panel-hover: #151719;
-      --text: #ecebe7;
-      --muted: #858783;
-      --dim: #555754;
-      --line: #242628;
-      --accent: #d9d7cf;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html,
-    body {
-      margin: 0;
-      min-height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family:
-        Inter,
-        ui-sans-serif,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-    }
-
-    body {
-      min-height: 100vh;
-    }
-
-    button,
-    a {
-      font: inherit;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    /* =========================
-       HEADER
-    ========================= */
-
-    header {
-      height: 74px;
-      border-bottom: 1px solid var(--line);
-      display: flex;
-      align-items: center;
-    }
-
-    .header-inner {
-      width: min(1080px, calc(100% - 40px));
-      margin: 0 auto;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .shovel {
-      width: 27px;
-      height: 27px;
-      display: block;
-    }
-
-    .brand-name {
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-    }
-
-    .header-status {
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    /* =========================
-       HOME
-    ========================= */
-
-    #home {
-      width: min(1080px, calc(100% - 40px));
-      margin: 0 auto;
-      padding: 82px 0 70px;
-    }
-
-    .eyebrow {
-      color: var(--muted);
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      margin-bottom: 18px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(45px, 8vw, 84px);
-      line-height: 0.94;
-      letter-spacing: -0.055em;
-      font-weight: 650;
-    }
-
-    .intro {
-      margin-top: 23px;
-      max-width: 550px;
-
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.7;
-    }
-
-    .games-section {
-      margin-top: 66px;
-    }
-
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 16px;
-    }
-
-    .section-title {
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-    }
-
-    .game-count {
-      color: var(--dim);
-      font-size: 11px;
-    }
-
-    .game-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-
-    .game-card {
-      min-height: 150px;
-      padding: 20px;
-
-      border: 1px solid var(--line);
-      background: var(--panel);
-
-      cursor: pointer;
-      transition:
-        transform 0.16s ease,
-        border-color 0.16s ease,
-        background 0.16s ease;
-    }
-
-    .game-card:hover {
-      transform: translateY(-2px);
-      border-color: #3a3d40;
-      background: var(--panel-hover);
-    }
-
-    .game-card:active {
-      transform: translateY(0);
-    }
-
-    .card-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-    }
-
-    .game-number,
-    .game-type {
-      color: var(--dim);
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .game-name {
-      margin-top: 34px;
-      font-size: 18px;
-      font-weight: 550;
-      letter-spacing: -0.01em;
-    }
-
-    .game-description {
-      margin-top: 7px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    footer {
-      border-top: 1px solid var(--line);
-      padding: 22px 0 28px;
-
-      color: var(--dim);
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .footer-inner {
-      width: min(1080px, calc(100% - 40px));
-      margin: 0 auto;
-    }
-
-    /* =========================
-       GAME VIEW
-    ========================= */
-
-    #game-view {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: #000;
-      z-index: 100;
-    }
-
-    .game-toolbar {
-      position: absolute;
-      z-index: 20;
-      top: 0;
-      left: 0;
-      right: 0;
-
-      height: 52px;
-
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      padding: 0 16px;
-
-      background: rgba(9, 10, 11, 0.94);
-      border-bottom: 1px solid #232527;
-
-      backdrop-filter: blur(8px);
-    }
-
-    .back-button {
-      border: 0;
-      background: transparent;
-      color: var(--muted);
-
-      padding: 6px 0;
-
-      font-size: 11px;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
-
-      cursor: pointer;
-    }
-
-    .back-button:hover {
-      color: var(--text);
-    }
-
-    .game-view-title {
-      color: var(--text);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    #game-frame-container {
-      position: absolute;
-      top: 52px;
-      left: 0;
-      right: 0;
-      bottom: 0;
-
-      background: #000;
-    }
-
-    #game-frame {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
-      background: #000;
-    }
-
-    /* =========================
-       MOBILE
-    ========================= */
-
-    @media (max-width: 800px) {
-      .game-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    @media (max-width: 560px) {
-      .header-inner,
-      #home,
-      .footer-inner {
-        width: min(100% - 28px, 1080px);
-      }
-
-      header {
-        height: 66px;
-      }
-
-      .header-status {
-        display: none;
-      }
-
-      #home {
-        padding-top: 58px;
-      }
-
-      .game-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
-</head>
-
-<body>
-
-  <!-- ================================
-       NORMAL SITE
-  ================================= -->
-
-  <header>
-    <div class="header-inner">
-
-      <div class="brand" onclick="showHome()">
-
-        <!-- Minimal shovel logo -->
-        <svg
-          class="shovel"
-          viewBox="0 0 32 32"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-label="The Underground"
-        >
-          <path
-            d="M18.2 3.5
-               C19.4 2.8 20.9 3.2 21.6 4.4
-               L24.2 8.8
-               C24.9 10 24.5 11.5 23.3 12.2
-               L19.3 14.5
-               L25 24.4
-               C25.7 25.6 25.3 27.1 24.1 27.8
-               L21.4 29.4
-               C20.2 30.1 18.7 29.7 18 28.5
-               L12.3 18.6
-               L8.4 20.8
-               C7.2 21.5 5.7 21.1 5 19.9
-               L2.4 15.5
-               C1.7 14.3 2.1 12.8 3.3 12.1
-               L18.2 3.5Z"
-            stroke="currentColor"
-            stroke-width="1.7"
-          />
-
-          <path
-            d="M12.9 17.1L23.2 11"
-            stroke="currentColor"
-            stroke-width="1.7"
-            stroke-linecap="round"
-          />
-        </svg>
-
-        <span class="brand-name">
-          The Underground
-        </span>
-      </div>
-
-      <div class="header-status">
-        one room / no noise
-      </div>
-
-    </div>
-  </header>
-
-  <main id="home">
-
-    <div class="eyebrow">
-      Enter quietly.
-    </div>
-
-    <h1>
-      The Underground.
-    </h1>
-
-    <p class="intro">
-      A small collection of games.
-      No feeds. No clutter. No nonsense.
-      Pick something and disappear for a while.
-    </p>
-
-    <section class="games-section">
-
-      <div class="section-header">
-
-        <div class="section-title">
-          Games
-        </div>
-
-        <div class="game-count">
-          04
-        </div>
-
-      </div>
-
-      <div class="game-grid">
-
-        <!-- ============================
-             GAME 001
-        ============================= -->
-
-        <div
-          class="game-card"
-          onclick="openGame('Age of War', createAgeOfWar())"
-        >
-
-          <div class="card-top">
-            <div class="game-number">
-              001
-            </div>
-
-            <div class="game-type">
-              FLASH
-            </div>
-          </div>
-
-          <div class="game-name">
-            Age of War
-          </div>
-
-          <div class="game-description">
-            Classic Flash strategy through Ruffle.
-          </div>
-
-        </div>
-
-
-        <!-- ============================
-             GAME 002
-        ============================= -->
-
-        <div
-          class="game-card"
-          onclick="openGame('Time Shooter 3 SWAT', createTimeShooter())"
-        >
-
-          <div class="card-top">
-            <div class="game-number">
-              002
-            </div>
-
-            <div class="game-type">
-              WEBGL
-            </div>
-          </div>
-
-          <div class="game-name">
-            Time Shooter 3 SWAT
-          </div>
-
-          <div class="game-description">
-            Unity WebGL shooter.
-          </div>
-
-        </div>
-
-
-        <!-- ============================
-             GAME 003
-        ============================= -->
-
-        <div
-          class="game-card"
-          onclick="openGame('Ragdoll Archers', createRagdollArchers())"
-        >
-
-          <div class="card-top">
-            <div class="game-number">
-              003
-            </div>
-
-            <div class="game-type">
-              WEBGL
-            </div>
-          </div>
-
-          <div class="game-name">
-            Ragdoll Archers
-          </div>
-
-          <div class="game-description">
-            Physics-based archery game.
-          </div>
-
-        </div>
-
-
-        <!-- ============================
-             GAME 004
-        ============================= -->
-
-        <div
-          class="game-card"
-          onclick="openGame('Pixel Client', createPixelClient())"
-        >
-
-          <div class="card-top">
-            <div class="game-number">
-              004
-            </div>
-
-            <div class="game-type">
-              WEB
-            </div>
-          </div>
-
-          <div class="game-name">
-            Pixel Client
-          </div>
-
-          <div class="game-description">
-            Pixel Client loaded from its supplied build.
-          </div>
-
-        </div>
-
-      </div>
-
-    </section>
-
-  </main>
-
-  <footer>
-    <div class="footer-inner">
-      The Underground · quiet by design
-    </div>
-  </footer>
-
-
-  <!-- ================================
-       GAME WINDOW
-  ================================= -->
-
-  <div id="game-view">
-
-    <div class="game-toolbar">
-
-      <button
-        class="back-button"
-        onclick="showHome()"
-      >
-        ← The Underground
-      </button>
-
-      <div
-        class="game-view-title"
-        id="game-view-title"
-      >
-        Game
-      </div>
-
-    </div>
-
-    <div id="game-frame-container">
-      <iframe
-        id="game-frame"
-        allow="fullscreen; autoplay"
-        allowfullscreen
-        referrerpolicy="no-referrer"
-      ></iframe>
-    </div>
-
-  </div>
-
-
-  <script>
-
-    /* =========================================
-       BASIC NAVIGATION
-    ========================================= */
-
-    const home = document.getElementById("home");
-    const gameView = document.getElementById("game-view");
-    const gameFrame = document.getElementById("game-frame");
-    const gameTitle = document.getElementById("game-view-title");
-
-    function openGame(title, html) {
-
-      gameTitle.textContent = title;
-
-      gameView.style.display = "block";
-      home.style.display = "none";
-
-      gameFrame.srcdoc = html;
-
-      window.scrollTo(0, 0);
-
-    }
-
-
-    function showHome() {
-
-      gameFrame.srcdoc = "";
-
-      gameView.style.display = "none";
-      home.style.display = "block";
-
-    }
-
-
-    /* =========================================
-       AGE OF WAR
-    ========================================= */
-
-    function createAgeOfWar() {
-
-      return `
-<!DOCTYPE html>
-<html>
-<head>
-
-<meta charset="utf-8">
-
-<meta
-  name="viewport"
-  content="width=device-width,
-           initial-scale=1.0,
-           user-scalable=no"
->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b0c0d">
+
+<title>The Underground</title>
 
 <style>
+:root {
+  --bg: #0b0c0d;
+  --panel: #111315;
+  --panel-hover: #151719;
+  --text: #ecebe7;
+  --muted: #858783;
+  --dim: #555754;
+  --line: #242628;
+}
+
+* {
+  box-sizing: border-box;
+}
 
 html,
 body {
-
   margin: 0;
-  padding: 0;
-
-  width: 100%;
-  height: 100%;
-
-  overflow: hidden;
-
-  background: black;
-
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
-#flash-container {
+body {
+  min-height: 100vh;
+}
 
+button {
+  font: inherit;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+header {
+  height: 74px;
+  border-bottom: 1px solid var(--line);
+
+  display: flex;
+  align-items: center;
+}
+
+.header-inner {
+  width: min(1080px, calc(100% - 40px));
+  margin: 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  cursor: pointer;
+  user-select: none;
+}
+
+.shovel {
+  width: 27px;
+  height: 27px;
+  display: block;
+}
+
+.brand-name {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.header-status {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* =========================
+   HOME
+========================= */
+
+#home {
+  width: min(1080px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 82px 0 70px;
+}
+
+.eyebrow {
+  color: var(--muted);
+
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+
+  margin-bottom: 18px;
+}
+
+h1 {
+  margin: 0;
+
+  font-size: clamp(45px, 8vw, 84px);
+  line-height: 0.94;
+
+  letter-spacing: -0.055em;
+
+  font-weight: 650;
+}
+
+.intro {
+  margin-top: 23px;
+
+  max-width: 550px;
+
+  color: var(--muted);
+
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.games-section {
+  margin-top: 66px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+
+  margin-bottom: 16px;
+}
+
+.section-title {
+  color: var(--muted);
+
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.game-count {
+  color: var(--dim);
+  font-size: 11px;
+}
+
+.game-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 10px;
+}
+
+.game-card {
+  min-height: 150px;
+
+  padding: 20px;
+
+  border: 1px solid var(--line);
+
+  background: var(--panel);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-2px);
+
+  border-color: #3a3d40;
+
+  background: var(--panel-hover);
+}
+
+.game-card:active {
+  transform: translateY(0);
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.game-number,
+.game-type {
+  color: var(--dim);
+
+  font-size: 10px;
+
+  letter-spacing: 0.1em;
+
+  text-transform: uppercase;
+}
+
+.game-name {
+  margin-top: 34px;
+
+  font-size: 18px;
+
+  font-weight: 550;
+
+  letter-spacing: -0.01em;
+}
+
+.game-description {
+  margin-top: 7px;
+
+  color: var(--muted);
+
+  font-size: 12px;
+
+  line-height: 1.5;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+  border-top: 1px solid var(--line);
+
+  padding: 22px 0 28px;
+
+  color: var(--dim);
+
+  font-size: 10px;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+.footer-inner {
+  width: min(1080px, calc(100% - 40px));
+
+  margin: 0 auto;
+}
+
+/* =========================
+   GAME VIEW
+========================= */
+
+#game-view {
+  display: none;
+
+  position: fixed;
+
+  inset: 0;
+
+  background: #000;
+
+  z-index: 100;
+}
+
+.game-toolbar {
   position: absolute;
 
-  top: 50%;
-  left: 50%;
+  z-index: 9999;
 
-  transform:
-    translate(-50%, -50%);
+  top: 0;
+  left: 0;
+  right: 0;
 
-  background: black;
+  height: 52px;
 
-  overflow: hidden;
+  display: flex;
 
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 0 16px;
+
+  background:
+    rgba(9, 10, 11, 0.94);
+
+  border-bottom:
+    1px solid #232527;
+
+  backdrop-filter:
+    blur(8px);
 }
 
-ruffle-player {
+.toolbar-left {
+  display: flex;
 
+  align-items: center;
+
+  gap: 18px;
+}
+
+.back-button,
+.fullscreen-button {
+  border: 0;
+
+  background: transparent;
+
+  color: var(--muted);
+
+  padding: 6px 0;
+
+  font-size: 11px;
+
+  letter-spacing: 0.09em;
+
+  text-transform: uppercase;
+
+  cursor: pointer;
+}
+
+.back-button:hover,
+.fullscreen-button:hover {
+  color: var(--text);
+}
+
+.game-view-title {
+  color: var(--text);
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  letter-spacing: 0.08em;
+
+  text-transform: uppercase;
+}
+
+#game-frame-container {
+  position: absolute;
+
+  top: 52px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  background: #000;
+}
+
+#game-frame {
   width: 100%;
   height: 100%;
-
-  background: black;
 
   display: block;
 
+  border: 0;
+
+  background: #000;
+
+  outline: none;
 }
 
+/* =========================
+   FULLSCREEN
+========================= */
+
+#game-view:fullscreen {
+  background: #000;
+}
+
+#game-view:fullscreen .game-toolbar {
+  display: none;
+}
+
+#game-view:fullscreen #game-frame-container {
+  top: 0;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 800px) {
+
+  .game-grid {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+}
+
+@media (max-width: 560px) {
+
+  .header-inner,
+  #home,
+  .footer-inner {
+    width:
+      min(
+        100% - 28px,
+        1080px
+      );
+  }
+
+  header {
+    height: 66px;
+  }
+
+  .header-status {
+    display: none;
+  }
+
+  #home {
+    padding-top: 58px;
+  }
+
+  .game-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
 </style>
-
-<script
-  src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@0.2.0-nightly.2025.10.2/ruffle.min.js">
-</script>
-
 </head>
 
 <body>
 
-<div id="flash-container"></div>
+<!-- =========================
+     HEADER
+========================= -->
+
+<header>
+
+<div class="header-inner">
+
+<div
+  class="brand"
+  onclick="showHome()"
+>
+
+<svg
+  class="shovel"
+  viewBox="0 0 32 32"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+
+<path
+d="M18.2 3.5
+C19.4 2.8 20.9 3.2 21.6 4.4
+L24.2 8.8
+C24.9 10 24.5 11.5 23.3 12.2
+L19.3 14.5
+L25 24.4
+C25.7 25.6 25.3 27.1 24.1 27.8
+L21.4 29.4
+C20.2 30.1 18.7 29.7 18 28.5
+L12.3 18.6
+L8.4 20.8
+C7.2 21.5 5.7 21.1 5 19.9
+L2.4 15.5
+C1.7 14.3 2.1 12.8 3.3 12.1
+L18.2 3.5Z"
+stroke="currentColor"
+stroke-width="1.7"
+/>
+
+<path
+d="M12.9 17.1L23.2 11"
+stroke="currentColor"
+stroke-width="1.7"
+stroke-linecap="round"
+/>
+
+</svg>
+
+<span class="brand-name">
+The Underground
+</span>
+
+</div>
+
+<div class="header-status">
+one room / no noise
+</div>
+
+</div>
+
+</header>
+
+
+<!-- =========================
+     HOME
+========================= -->
+
+<main id="home">
+
+<div class="eyebrow">
+Enter quietly.
+</div>
+
+<h1>
+The Underground.
+</h1>
+
+<p class="intro">
+A small collection of games.
+No feeds. No clutter. No nonsense.
+Pick something and disappear for a while.
+</p>
+
+
+<section class="games-section">
+
+<div class="section-header">
+
+<div class="section-title">
+Games
+</div>
+
+<div class="game-count">
+04
+</div>
+
+</div>
+
+
+<div class="game-grid">
+
+
+<!-- =========================
+     AGE OF WAR
+========================= -->
+
+<div
+class="game-card"
+onclick="openGame(
+  'Age of War',
+  createAgeOfWar
+)"
+>
+
+<div class="card-top">
+
+<div class="game-number">
+001
+</div>
+
+<div class="game-type">
+FLASH
+</div>
+
+</div>
+
+<div class="game-name">
+Age of War
+</div>
+
+<div class="game-description">
+Classic Flash strategy through Ruffle.
+</div>
+
+</div>
+
+
+<!-- =========================
+     TIME SHOOTER
+========================= -->
+
+<div
+class="game-card"
+onclick="openGame(
+  'Time Shooter 3 SWAT',
+  createTimeShooter
+)"
+>
+
+<div class="card-top">
+
+<div class="game-number">
+002
+</div>
+
+<div class="game-type">
+WEBGL
+</div>
+
+</div>
+
+<div class="game-name">
+Time Shooter 3 SWAT
+</div>
+
+<div class="game-description">
+Unity WebGL shooter.
+</div>
+
+</div>
+
+
+<!-- =========================
+     RAGDOLL
+========================= -->
+
+<div
+class="game-card"
+onclick="openGame(
+  'Ragdoll Archers',
+  createRagdollArchers
+)"
+>
+
+<div class="card-top">
+
+<div class="game-number">
+003
+</div>
+
+<div class="game-type">
+WEBGL
+</div>
+
+</div>
+
+<div class="game-name">
+Ragdoll Archers
+</div>
+
+<div class="game-description">
+Physics-based archery game.
+</div>
+
+</div>
+
+
+<!-- =========================
+     EAGLERCRAFT
+========================= -->
+
+<div
+class="game-card"
+onclick="openGame(
+  'Pixel Client',
+  createPixelClient
+)"
+>
+
+<div class="card-top">
+
+<div class="game-number">
+004
+</div>
+
+<div class="game-type">
+EAGLERCRAFT
+</div>
+
+</div>
+
+<div class="game-name">
+Pixel Client
+</div>
+
+<div class="game-description">
+Minecraft in your browser.
+</div>
+
+</div>
+
+
+</div>
+
+</section>
+
+</main>
+
+
+<footer>
+
+<div class="footer-inner">
+The Underground · quiet by design
+</div>
+
+</footer>
+
+
+<!-- =========================
+     GAME WINDOW
+========================= -->
+
+<div id="game-view">
+
+<div class="game-toolbar">
+
+<div class="toolbar-left">
+
+<button
+class="back-button"
+onclick="showHome()"
+>
+← The Underground
+</button>
+
+<div
+class="game-view-title"
+id="game-view-title"
+>
+Game
+</div>
+
+</div>
+
+
+<button
+class="fullscreen-button"
+onclick="toggleFullscreen()"
+>
+FULLSCREEN
+</button>
+
+</div>
+
+
+<div id="game-frame-container">
+
+<iframe
+id="game-frame"
+allow="fullscreen; autoplay; gamepad; pointer-lock"
+allowfullscreen
+tabindex="0"
+referrerpolicy="no-referrer"
+></iframe>
+
+</div>
+
+</div>
+
 
 <script>
 
-const container =
-  document.getElementById("flash-container");
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+const home =
+document.getElementById(
+  "home"
+);
+
+const gameView =
+document.getElementById(
+  "game-view"
+);
+
+const gameTitle =
+document.getElementById(
+  "game-view-title"
+);
+
+let gameFrame =
+document.getElementById(
+  "game-frame"
+);
 
 
-function resizeGame() {
+/* =========================================================
+   OPEN GAME
+========================================================= */
 
-  const width =
-    window.innerWidth;
+function openGame(
+  title,
+  creator
+) {
 
-  const height =
-    window.innerHeight;
-
-  const aspect =
-    5.5 / 3;
-
-
-  let gameWidth =
-    width;
-
-  let gameHeight =
-    Math.floor(gameWidth / aspect);
+  destroyGame();
 
 
-  if (gameHeight > height) {
+  gameTitle.textContent =
+    title;
 
-    gameHeight = height;
 
-    gameWidth =
-      Math.floor(gameHeight * aspect);
+  home.style.display =
+    "none";
+
+
+  gameView.style.display =
+    "block";
+
+
+  /*
+   * IMPORTANT:
+   *
+   * The game is generated HERE.
+   *
+   * It is NOT generated when
+   * the homepage loads.
+   */
+
+  const html =
+    creator();
+
+
+  gameFrame.srcdoc =
+    html;
+
+
+  /*
+   * Focus the iframe after
+   * it finishes loading.
+   */
+
+  gameFrame.onload =
+    function() {
+
+      try {
+
+        gameFrame.focus();
+
+        const doc =
+          gameFrame.contentDocument;
+
+        if (doc) {
+
+          if (doc.body) {
+
+            doc.body.focus();
+
+          }
+
+          const canvas =
+            doc.querySelector(
+              "canvas"
+            );
+
+          if (canvas) {
+
+            canvas.focus();
+
+          }
+
+        }
+
+      }
+
+      catch (error) {
+
+        console.log(
+          "Focus:",
+          error
+        );
+
+      }
+
+    };
+
+
+  window.scrollTo(
+    0,
+    0
+  );
+
+}
+
+
+/* =========================================================
+   DESTROY GAME
+========================================================= */
+
+function destroyGame() {
+
+  /*
+   * Completely replace the iframe.
+   *
+   * This kills all game JavaScript.
+   */
+
+  const newFrame =
+    document.createElement(
+      "iframe"
+    );
+
+
+  newFrame.id =
+    "game-frame";
+
+
+  newFrame.allow =
+    "fullscreen; autoplay; gamepad; pointer-lock";
+
+
+  newFrame.allowFullscreen =
+    true;
+
+
+  newFrame.tabIndex =
+    0;
+
+
+  newFrame.referrerPolicy =
+    "no-referrer";
+
+
+  gameFrame.replaceWith(
+    newFrame
+  );
+
+
+  gameFrame =
+    newFrame;
+
+}
+
+
+/* =========================================================
+   HOME
+========================================================= */
+
+function showHome() {
+
+  if (
+    document.fullscreenElement
+  ) {
+
+    document.exitFullscreen()
+      .catch(() => {});
 
   }
 
 
-  container.style.width =
-    gameWidth + "px";
+  destroyGame();
 
-  container.style.height =
-    gameHeight + "px";
+
+  gameView.style.display =
+    "none";
+
+
+  home.style.display =
+    "block";
+
+
+  gameTitle.textContent =
+    "Game";
 
 }
 
 
-window.addEventListener(
-  "resize",
-  resizeGame
-);
+/* =========================================================
+   FULLSCREEN
+========================================================= */
 
+async function toggleFullscreen() {
 
-window.addEventListener(
-  "DOMContentLoaded",
-  () => {
+  try {
 
-    resizeGame();
+    if (
+      document.fullscreenElement
+    ) {
 
-
-    const api =
-      window.RufflePlayer;
-
-
-    if (!api) {
-
-      container.innerHTML =
-        '<div style="color:white;text-align:center;padding:30px;font-family:system-ui">Ruffle failed to load.</div>';
+      await document.exitFullscreen();
 
       return;
 
     }
 
 
-    const ruffle =
-      api.newest();
+    await gameView.requestFullscreen();
 
+  }
 
-    const player =
-      ruffle.createPlayer();
+  catch (error) {
 
-
-    player.style.width =
-      "100%";
-
-    player.style.height =
-      "100%";
-
-    player.style.background =
-      "black";
-
-
-    container.appendChild(
-      player
-    );
-
-
-    player.load(
-      "https://cdn.jsdelivr.net/gh/artyomriseofnations/gs-swf@6ed8a67a935c49240d2a6dc1e8d4fc8466a28aca/Age%20of%20War.swf"
+    console.error(
+      "Fullscreen:",
+      error
     );
 
   }
 
-);
-
-</script>
-
-</body>
-</html>
-      `;
-
-    }
+}
 
 
-    /* =========================================
-       TIME SHOOTER 3 SWAT
-    ========================================= */
+/* =========================================================
+   AGE OF WAR
+========================================================= */
 
-    function createTimeShooter() {
+function createAgeOfWar() {
 
-      return `
+return `
 <!DOCTYPE html>
+
 <html>
 
 <head>
@@ -845,10 +1008,10 @@ window.addEventListener(
 <meta charset="utf-8">
 
 <meta
-  name="viewport"
-  content="width=device-width,
-           initial-scale=1.0,
-           user-scalable=no"
+name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+user-scalable=no"
 >
 
 <style>
@@ -856,83 +1019,287 @@ window.addEventListener(
 html,
 body {
 
-  margin: 0;
-  padding: 0;
+margin: 0;
+padding: 0;
 
-  width: 100%;
-  height: 100%;
+width: 100%;
+height: 100%;
 
-  overflow: hidden;
+overflow: hidden;
 
-  background: black;
+background: black;
+
+}
+
+#flash-container {
+
+position: absolute;
+
+top: 50%;
+left: 50%;
+
+transform:
+translate(-50%, -50%);
+
+background: black;
+
+overflow: hidden;
+
+}
+
+ruffle-player {
+
+width: 100%;
+height: 100%;
+
+display: block;
+
+background: black;
+
+}
+
+</style>
+
+<script
+src="https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@0.2.0-nightly.2025.10.2/ruffle.min.js">
+<\/script>
+
+</head>
+
+<body>
+
+<div
+id="flash-container"
+></div>
+
+
+<script>
+
+const container =
+document.getElementById(
+"flash-container"
+);
+
+
+function resizeGame() {
+
+const width =
+window.innerWidth;
+
+const height =
+window.innerHeight;
+
+const aspect =
+5.5 / 3;
+
+
+let gameWidth =
+width;
+
+let gameHeight =
+Math.floor(
+gameWidth / aspect
+);
+
+
+if (
+gameHeight > height
+) {
+
+gameHeight =
+height;
+
+gameWidth =
+Math.floor(
+gameHeight * aspect
+);
+
+}
+
+
+container.style.width =
+gameWidth + "px";
+
+container.style.height =
+gameHeight + "px";
+
+}
+
+
+window.addEventListener(
+"resize",
+resizeGame
+);
+
+
+window.addEventListener(
+"DOMContentLoaded",
+() => {
+
+resizeGame();
+
+
+const api =
+window.RufflePlayer;
+
+
+if (!api) {
+
+container.innerHTML =
+'<div style="color:white;text-align:center;padding:30px;font-family:system-ui">Ruffle failed to load.</div>';
+
+return;
+
+}
+
+
+const ruffle =
+api.newest();
+
+
+const player =
+ruffle.createPlayer();
+
+
+player.style.width =
+"100%";
+
+player.style.height =
+"100%";
+
+player.style.background =
+"black";
+
+
+container.appendChild(
+player
+);
+
+
+player.load(
+"https://cdn.jsdelivr.net/gh/artyomriseofnations/gs-swf@6ed8a67a935c49240d2a6dc1e8d4fc8466a28aca/Age%20of%20War.swf"
+);
+
+}
+
+);
+
+<\/script>
+
+</body>
+
+</html>
+`;
+
+}
+
+
+/* =========================================================
+   TIME SHOOTER
+========================================================= */
+
+function createTimeShooter() {
+
+return `
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+user-scalable=no"
+>
+
+<style>
+
+html,
+body {
+
+margin: 0;
+padding: 0;
+
+width: 100%;
+height: 100%;
+
+overflow: hidden;
+
+background: black;
 
 }
 
 #unity-container {
 
-  position: absolute;
+position: absolute;
 
-  inset: 0;
+inset: 0;
 
-  background: black;
+background: black;
 
 }
 
 #unity-canvas {
 
-  width: 100%;
-  height: 100%;
+width: 100%;
+height: 100%;
 
-  display: block;
+display: block;
 
-  background: black;
+background: black;
+
+outline: none;
 
 }
 
 #loading-cover {
 
-  position: fixed;
+position: fixed;
 
-  inset: 0;
+inset: 0;
 
-  z-index: 10;
+z-index: 10;
 
-  background: black;
+background: black;
 
-  display: flex;
+display: flex;
 
-  align-items: center;
+align-items: center;
 
-  justify-content: center;
+justify-content: center;
 
 }
 
 #loading-bar {
 
-  width: min(
-    360px,
-    80vw
-  );
+width: min(
+360px,
+80vw
+);
 
 }
 
 #progress-empty {
 
-  width: 100%;
+width: 100%;
 
-  height: 3px;
+height: 3px;
 
-  background: #202224;
+background: #202224;
 
 }
 
 #progress-full {
 
-  width: 0%;
+width: 0%;
 
-  height: 100%;
+height: 100%;
 
-  background: #d9d7cf;
+background: #d9d7cf;
 
 }
 
@@ -942,17 +1309,21 @@ body {
 
 <body>
 
-<div id="unity-container">
+<div
+id="unity-container"
+>
 
 <canvas
-  id="unity-canvas"
-  tabindex="-1">
-</canvas>
+id="unity-canvas"
+tabindex="-1"
+></canvas>
 
 </div>
 
 
-<div id="loading-cover">
+<div
+id="loading-cover"
+>
 
 <div id="loading-bar">
 
@@ -1002,7 +1373,7 @@ productVersion:
 
 const canvas =
 document.getElementById(
-  "unity-canvas"
+"unity-canvas"
 );
 
 
@@ -1014,7 +1385,7 @@ buildUrl +
 
 const loader =
 document.createElement(
-  "script"
+"script"
 );
 
 
@@ -1026,57 +1397,58 @@ buildUrl +
 loader.onload =
 () => {
 
-  if (
-    typeof createUnityInstance !==
-    "function"
-  ) {
+if (
+typeof createUnityInstance !==
+"function"
+) {
 
-    showError(
-      "Unity loader failed."
-    );
+showError(
+"Unity loader failed."
+);
 
-    return;
+return;
 
-  }
+}
 
 
-  createUnityInstance(
+createUnityInstance(
+canvas,
+config,
+progress => {
 
-    canvas,
+document.getElementById(
+"progress-full"
+).style.width =
+(progress * 100) + "%";
 
-    config,
+}
+)
 
-    progress => {
+.then(
+instance => {
 
-      document.getElementById(
-        "progress-full"
-      ).style.width =
-        (progress * 100) + "%";
+window.unityInstance =
+instance;
 
-    }
+canvas.focus();
 
-  ).then(
+document.getElementById(
+"loading-cover"
+).style.display =
+"none";
 
-    () => {
+}
+)
 
-      document.getElementById(
-        "loading-cover"
-      ).style.display =
-        "none";
+.catch(
+error => {
 
-    }
+showError(
+String(error)
+);
 
-  ).catch(
-
-    message => {
-
-      showError(
-        String(message)
-      );
-
-    }
-
-  );
+}
+);
 
 };
 
@@ -1084,78 +1456,91 @@ loader.onload =
 loader.onerror =
 () => {
 
-  showError(
-    "The Unity loader could not be reached."
-  );
+showError(
+"Unity loader could not be reached."
+);
 
 };
 
 
 document.body.appendChild(
-  loader
+loader
+);
+
+
+canvas.addEventListener(
+"click",
+() => {
+
+canvas.focus();
+
+try {
+
+canvas.requestPointerLock();
+
+}
+
+catch (e) {}
+
+}
 );
 
 
 function showError(message) {
 
-  document.getElementById(
-    "loading-cover"
-  ).innerHTML =
+document.getElementById(
+"loading-cover"
+).innerHTML =
 
-    '<div style="' +
-      'color:#aaa;' +
-      'font:14px system-ui;' +
-      'text-align:center;' +
-      'padding:24px' +
-    '">' +
+'<div style="' +
+'color:#aaa;' +
+'font:14px system-ui;' +
+'text-align:center;' +
+'padding:24px' +
+'">' +
 
-    'The game could not load.' +
+'The game could not load.' +
 
-    '<br><br>' +
+'<br><br>' +
 
-    '<span style="color:#666">' +
+'<span style="color:#666">' +
+message +
+'</span>' +
 
-    message +
-
-    '</span>' +
-
-    '</div>';
+'</div>';
 
 }
 
-</script>
+<\/script>
 
 </body>
+
 </html>
-      `;
+`;
 
-    }
+}
 
 
-    /* =========================================
-       RAGDOLL ARCHERS
-    ========================================= */
+/* =========================================================
+   RAGDOLL ARCHERS
+========================================================= */
 
-    function createRagdollArchers() {
+function createRagdollArchers() {
 
-      return `
+return `
 <!DOCTYPE html>
-<html lang="en">
+
+<html>
 
 <head>
 
 <meta charset="utf-8">
 
 <meta
-  name="viewport"
-  content="width=device-width,
-           initial-scale=1.0,
-           user-scalable=no"
->
-
-<link
-  rel="stylesheet"
-  href="https://cdn.jsdelivr.net/gh/bubbls/ruffle@04dd5345a30d6ebf4b0e2cc385568750cd56ed5a/styyyle.css"
+name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+user-scalable=no"
 >
 
 <style>
@@ -1163,85 +1548,85 @@ function showError(message) {
 html,
 body {
 
-  margin: 0;
-  padding: 0;
+margin: 0;
+padding: 0;
 
-  width: 100%;
-  height: 100%;
+width: 100%;
+height: 100%;
 
-  overflow: hidden;
+overflow: hidden;
 
-  background: black;
+background: black;
 
 }
 
 #unity-container {
 
-  position: absolute;
+position: absolute;
 
-  inset: 0;
+inset: 0;
 
-  background: black;
+background: black;
 
 }
 
 #unity-canvas {
 
-  width: 100%;
-  height: 100%;
+width: 100%;
+height: 100%;
 
-  display: block;
+display: block;
 
-  background: black;
+background: black;
 
-  outline: none;
+outline: none;
 
 }
 
 #loading-cover {
 
-  position: fixed;
+position: fixed;
 
-  inset: 0;
+inset: 0;
 
-  z-index: 10;
+z-index: 10;
 
-  background: black;
+background: black;
 
-  display: flex;
+display: flex;
 
-  align-items: center;
+align-items: center;
 
-  justify-content: center;
+justify-content: center;
 
 }
 
 #loading-bar {
 
-  width: min(
-    360px,
-    80vw
-  );
+width: min(
+360px,
+80vw
+);
 
 }
 
 #progress-empty {
 
-  width: 100%;
+width: 100%;
 
-  height: 3px;
+height: 3px;
 
-  background: #202224;
+background: #202224;
 
 }
 
 #progress-full {
 
-  width: 0%;
+width: 0%;
 
-  height: 100%;
+height: 100%;
 
-  background: #d9d7cf;
+background: #d9d7cf;
 
 }
 
@@ -1251,18 +1636,21 @@ body {
 
 <body>
 
-
-<div id="unity-container">
+<div
+id="unity-container"
+>
 
 <canvas
-  id="unity-canvas"
-  tabindex="-1">
-</canvas>
+id="unity-canvas"
+tabindex="-1"
+></canvas>
 
 </div>
 
 
-<div id="loading-cover">
+<div
+id="loading-cover"
+>
 
 <div id="loading-bar">
 
@@ -1287,7 +1675,7 @@ const loaderUrl =
 const config = {
 
 dataUrl:
-"https://cdn.jsdelivr.net/gh/bubbls/ruffle@04dd5345a30d6ebf4b0e2cc385568750cd56ed5a/6697b6deba8b617c67b69c55dcd07cb1.data.unityweb",
+"https://cdn.jsdelivr.net/gh/bubbls/ruffle@04dd5345a30d6ebf4b0e2cc385568750cd56ed5a/6697b6deba8b617c67b69c55dcd07cb3.data.unityweb",
 
 frameworkUrl:
 "https://cdn.jsdelivr.net/gh/bubbls/ruffle@04dd5345a30d6ebf4b0e2cc385568750cd56ed5a/0be3c3ee7115b26e1ae28e643afdf1f2.js.unityweb",
@@ -1312,25 +1700,25 @@ productVersion:
 
 const canvas =
 document.getElementById(
-  "unity-canvas"
+"unity-canvas"
 );
 
 
 const loading =
 document.getElementById(
-  "loading-cover"
+"loading-cover"
 );
 
 
 const progress =
 document.getElementById(
-  "progress-full"
+"progress-full"
 );
 
 
 const loader =
 document.createElement(
-  "script"
+"script"
 );
 
 
@@ -1341,58 +1729,56 @@ loaderUrl;
 loader.onload =
 () => {
 
-  if (
-    typeof createUnityInstance !==
-    "function"
-  ) {
+if (
+typeof createUnityInstance !==
+"function"
+) {
 
-    loading.innerHTML =
-      errorHTML(
-        "Unity loader failed."
-      );
+loading.innerHTML =
+errorHTML(
+"Unity loader failed."
+);
 
-    return;
+return;
 
-  }
+}
 
 
-  createUnityInstance(
+createUnityInstance(
+canvas,
+config,
+percent => {
 
-    canvas,
+progress.style.width =
+(percent * 100) + "%";
 
-    config,
+}
+)
 
-    percent => {
+.then(
+instance => {
 
-      progress.style.width =
-        (percent * 100) + "%";
+window.unityInstance =
+instance;
 
-    }
+canvas.focus();
 
-  ).then(
+loading.style.display =
+"none";
 
-    unityInstance => {
+}
+)
 
-      window.unityInstance =
-        unityInstance;
+.catch(
+error => {
 
-      loading.style.display =
-        "none";
+loading.innerHTML =
+errorHTML(
+String(error)
+);
 
-    }
-
-  ).catch(
-
-    message => {
-
-      loading.innerHTML =
-        errorHTML(
-          String(message)
-        );
-
-    }
-
-  );
+}
+);
 
 };
 
@@ -1400,86 +1786,94 @@ loader.onload =
 loader.onerror =
 () => {
 
-  loading.innerHTML =
-    errorHTML(
-      "The game loader could not be reached."
-    );
+loading.innerHTML =
+errorHTML(
+"The game loader could not be reached."
+);
 
 };
 
 
 document.body.appendChild(
-  loader
+loader
 );
 
 
-document.addEventListener(
-  "pointerdown",
-  () => {
+canvas.addEventListener(
+"click",
+() => {
 
-    canvas.focus();
+canvas.focus();
 
-  }
+try {
+
+canvas.requestPointerLock();
+
+}
+
+catch (e) {}
+
+}
 );
 
 
 function errorHTML(message) {
 
-  return `
+return (
 
-<div style="
-  color:#aaa;
-  font:14px system-ui;
-  text-align:center;
-  padding:24px;
-">
+'<div style="' +
+'color:#aaa;' +
+'font:14px system-ui;' +
+'text-align:center;' +
+'padding:24px;' +
+'">' +
 
-The game could not load.
+'The game could not load.' +
 
-<br><br>
+'<br><br>' +
 
-<span style="color:#666">
+'<span style="color:#666">' +
 
-${message}
+message +
 
-</span>
+'</span>' +
 
-</div>
+'</div>'
 
+);
+
+}
+
+<\/script>
+
+</body>
+
+</html>
 `;
 
 }
 
-</script>
 
-</body>
-</html>
-      `;
+/* =========================================================
+   EAGLERCRAFT / PIXEL CLIENT
+========================================================= */
 
-    }
+function createPixelClient() {
 
-
-    /* =========================================
-       PIXEL CLIENT
-    ========================================= */
-
-    function createPixelClient() {
-
-      return `
+return `
 <!DOCTYPE html>
+
 <html>
 
 <head>
 
-<meta
-  charset="utf-8"
->
+<meta charset="utf-8">
 
 <meta
-  name="viewport"
-  content="width=device-width,
-           initial-scale=1.0,
-           user-scalable=no"
+name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+user-scalable=no"
 >
 
 <title>
@@ -1491,37 +1885,37 @@ Pixel Client
 html,
 body {
 
-  margin: 0;
-  padding: 0;
+margin: 0;
+padding: 0;
 
-  width: 100%;
-  height: 100%;
+width: 100%;
+height: 100%;
 
-  background: black;
+background: black;
 
-  overflow: hidden;
+overflow: hidden;
 
 }
 
 #loading {
 
-  position: fixed;
+position: fixed;
 
-  inset: 0;
+inset: 0;
 
-  display: flex;
+display: flex;
 
-  align-items: center;
+align-items: center;
 
-  justify-content: center;
+justify-content: center;
 
-  background: #000;
+background: #000;
 
-  color: #777;
+color: #777;
 
-  font: 13px system-ui;
+font: 13px system-ui;
 
-  letter-spacing: .08em;
+letter-spacing: .08em;
 
 }
 
@@ -1540,81 +1934,211 @@ LOADING
 
 async function loadAndRun() {
 
-  const urls = [
+const urls = [
 
-    "https://cdn.jsdelivr.net/gh/shayderrr/eaglercraft@main/pixel/clpixelclient.html.part1",
+"https://cdn.jsdelivr.net/gh/shayderrr/eaglercraft@main/pixel/clpixelclient.html.part1",
 
-    "https://cdn.jsdelivr.net/gh/shayderrr/eaglercraft@main/pixel/clpixelclient.html.part2"
+"https://cdn.jsdelivr.net/gh/shayderrr/eaglercraft@main/pixel/clpixelclient.html.part2"
 
-  ];
-
-
-  try {
-
-    let fullHtml = "";
+];
 
 
-    for (const url of urls) {
+try {
 
-      const response =
-        await fetch(url);
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          "Could not load " +
-          url
-        );
-
-      }
+let fullHtml = "";
 
 
-      fullHtml +=
-        await response.text();
+for (
+const url of urls
+) {
 
-    }
+const response =
+await fetch(url);
 
 
-    document.open();
+if (!response.ok) {
 
-    document.write(
-      fullHtml
-    );
-
-    document.close();
-
-  }
-
-  catch (error) {
-
-    document.getElementById(
-      "loading"
-    ).innerHTML =
-
-      "PIXEL CLIENT FAILED TO LOAD";
-
-    console.error(
-      error
-    );
-
-  }
+throw new Error(
+"Could not load " +
+url
+);
 
 }
 
 
+fullHtml +=
+await response.text();
+
+}
+
+
+/*
+ * Put Eaglercraft into the page.
+ */
+
+document.open();
+
+document.write(
+fullHtml
+);
+
+document.close();
+
+}
+
+catch (error) {
+
+const loading =
+document.getElementById(
+"loading"
+);
+
+if (loading) {
+
+loading.innerHTML =
+"PIXEL CLIENT FAILED TO LOAD" +
+"<br><br>" +
+String(error);
+
+}
+
+console.error(
+error
+);
+
+}
+
+}
+
+
+/*
+ * Eaglercraft starts ONLY because
+ * this iframe was created after the
+ * user clicked Pixel Client.
+ */
+
 loadAndRun();
 
-</script>
+<\/script>
 
 </body>
 
 </html>
-      `;
+`;
 
-    }
+}
 
-  </script>
+
+/* =========================================================
+   MOUSE / POINTER LOCK
+========================================================= */
+
+/*
+ * When the user clicks inside the iframe,
+ * attempt to lock the mouse.
+ *
+ * This is particularly useful for
+ * Minecraft/Eaglercraft and Unity games.
+ */
+
+document.addEventListener(
+"click",
+event => {
+
+if (
+gameView.style.display === "none"
+) {
+
+return;
+
+}
+
+const frameRect =
+gameFrame.getBoundingClientRect();
+
+
+const insideFrame =
+event.clientX >= frameRect.left &&
+event.clientX <= frameRect.right &&
+event.clientY >= frameRect.top &&
+event.clientY <= frameRect.bottom;
+
+
+if (!insideFrame) {
+
+return;
+
+}
+
+
+try {
+
+gameFrame.focus();
+
+}
+catch (e) {}
+
+
+try {
+
+if (
+gameFrame.contentDocument &&
+gameFrame.contentDocument.body
+) {
+
+gameFrame.contentDocument.body.focus();
+
+}
+
+}
+catch (e) {}
+
+});
+
+
+/* =========================================================
+   ESCAPE
+========================================================= */
+
+document.addEventListener(
+"keydown",
+event => {
+
+if (
+event.key === "Escape"
+) {
+
+if (
+document.pointerLockElement
+) {
+
+document.exitPointerLock();
+
+return;
+
+}
+
+if (
+document.fullscreenElement
+) {
+
+return;
+
+}
+
+if (
+gameView.style.display !== "none"
+) {
+
+showHome();
+
+}
+
+}
+
+});
+
+</script>
 
 </body>
 </html>
